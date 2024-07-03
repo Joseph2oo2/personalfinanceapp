@@ -1,0 +1,104 @@
+import 'package:flutter/material.dart';
+import 'package:personalfinanceapp/widgets/appbutton.dart';
+import 'package:personalfinanceapp/widgets/apptext.dart';
+import 'package:personalfinanceapp/widgets/customtextformfiled.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  final _loginKey = GlobalKey<FormState>();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        padding: const EdgeInsets.all(20),
+        height: double.infinity,
+        width: double.infinity,
+        child: Form(
+          key: _loginKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomTextFormField(
+                validator: (value){
+                  if(value!.isEmpty){
+                    return "Email is Mandatory";
+                  }
+                  return null;
+                },
+                  controller: _emailController, hintText: "Email"),
+              const SizedBox(
+                height: 20,
+              ),
+              CustomTextFormField(
+                  validator: (value){
+                    if(value!.isEmpty){
+                      return "Password is Mandatory";
+                    }
+                    if(value.length<6){
+                      return "Password should be greater than 6 characters";
+                    }
+                    return null;
+                  },
+                  obscureText: true,
+                  controller: _passwordController,
+                  hintText: "Password"),
+              const SizedBox(
+                height: 20,
+              ),
+              AppButton(
+                  height: 52,
+                  width: 250,
+                  color: Colors.deepOrange,
+                  onTap: () {
+
+                    if(_loginKey.currentState!.validate()){
+                      //login logic
+                      //get the user data from the hive db
+
+                      //redirect user to homepage
+                    }
+
+                  },
+                  child: AppText(
+                    data: "Login",
+                    color: Colors.white,
+                  )),
+              const SizedBox(
+                height: 40,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AppText(
+                    data: "Don't have an Account?",
+                    color: Colors.white,
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  InkWell(
+                    onTap: (){
+                      Navigator.pushNamed(context, '/register');
+                    },
+                      child: AppText(
+                    data: "Register",
+                    color: Colors.white,
+                  ))
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
