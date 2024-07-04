@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:personalfinanceapp/widgets/appbutton.dart';
 import 'package:personalfinanceapp/widgets/apptext.dart';
 import 'package:personalfinanceapp/widgets/customtextformfiled.dart';
+import 'package:provider/provider.dart';
+
+import '../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   final _loginKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.all(20),
@@ -28,22 +32,23 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomTextFormField(
-                validator: (value){
-                  if(value!.isEmpty){
-                    return "Email is Mandatory";
-                  }
-                  return null;
-                },
-                  controller: _emailController, hintText: "Email"),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Email is Mandatory";
+                    }
+                    return null;
+                  },
+                  controller: _emailController,
+                  hintText: "Email"),
               const SizedBox(
                 height: 20,
               ),
               CustomTextFormField(
-                  validator: (value){
-                    if(value!.isEmpty){
+                  validator: (value) {
+                    if (value!.isEmpty) {
                       return "Password is Mandatory";
                     }
-                    if(value.length<6){
+                    if (value.length < 6) {
                       return "Password should be greater than 6 characters";
                     }
                     return null;
@@ -58,15 +63,27 @@ class _LoginPageState extends State<LoginPage> {
                   height: 52,
                   width: 250,
                   color: Colors.deepOrange,
-                  onTap: () {
+                  onTap: () async {
+                    if (_loginKey.currentState!.validate()) {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          });
 
-                    if(_loginKey.currentState!.validate()){
-                      //login logic
-                      //get the user data from the hive db
-
-                      //redirect user to homepage
+                      final user = await authService.loginUser(
+                          _emailController.text.trim(),
+                          _passwordController.text);
+                      Navigator.pop(context);
+                      if (user != null) {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/home', (route) => false,
+                            arguments: user);
+                      }
                     }
-
                   },
                   child: AppText(
                     data: "Login",
@@ -86,13 +103,13 @@ class _LoginPageState extends State<LoginPage> {
                     width: 10,
                   ),
                   InkWell(
-                    onTap: (){
-                      Navigator.pushNamed(context, '/register');
-                    },
+                      onTap: () {
+                        Navigator.pushNamed(context, '/register');
+                      },
                       child: AppText(
-                    data: "Register",
-                    color: Colors.white,
-                  ))
+                        data: "Register",
+                        color: Colors.white,
+                      ))
                 ],
               )
             ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:personalfinanceapp/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -8,27 +10,48 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-
   @override
   void initState() {
-    Future.delayed(Duration(seconds: 3),(){
-       Navigator.pushReplacementNamed(context, 'login');
-    });
+   checkLoginState();
     super.initState();
   }
+
+  Future<void> checkLoginState() async {
+    await Future.delayed(Duration(seconds: 4));
+
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    final isLoggedIn = await authService.isUserLoggedIn();
+
+    if (isLoggedIn) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/home',
+        (route) => false,
+      );
+    } else {
+      Navigator.pushReplacementNamed(context, 'login');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(backgroundColor: Colors.white,),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+      ),
       body: Container(
         height: double.infinity,
         width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
-            Image.asset("assets/img/logo.png",height: 100,width: 180,),
+            Image.asset(
+              "assets/img/logo.png",
+              height: 100,
+              width: 180,
+            ),
           ],
         ),
       ),
